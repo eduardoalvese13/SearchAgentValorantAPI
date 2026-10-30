@@ -1,0 +1,44 @@
+@page "/"
+@inject HttpClient Http
+
+<h3>Search Agent Valorant API</h3>
+
+<div>
+    <input @bind="agentUuid" placeholder="Digite o UUID do Agente" style="width: 320px;" />
+    <button @onclick="BuscarAgente">Buscar</button>
+</div>
+
+@if (agentData != null)
+{
+    <div style="margin-top: 20px;">
+        <h4>@agentData.displayName</h4>
+        <p>@agentData.description</p>
+        @if (!string.IsNullOrEmpty(agentData.fullPortrait))
+        {
+            <img src="@agentData.fullPortrait" alt="@agentData.displayName" style="max-height: 400px;" />
+        }
+    </div>
+}
+
+@code {
+    private string agentUuid = "e370fa57-4757-3604-3648-499e1f642d3f";
+    private AgentData? agentData;
+
+    private async Task BuscarAgente()
+    {
+        var response = await Http.GetFromJsonAsync<ValorantResponse>($"https://valorant-api.com/v1/agents/{agentUuid}");
+        agentData = response?.data;
+    }
+
+    public class ValorantResponse
+    {
+        public AgentData? data { get; set; }
+    }
+
+    public class AgentData
+    {
+        public string? displayName { get; set; }
+        public string? description { get; set; }
+        public string? fullPortrait { get; set; }
+    }
+}
